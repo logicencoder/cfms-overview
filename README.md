@@ -1,43 +1,45 @@
-# CFMS — Cloudflare Management System (overview)
+# CFMS — Cloudflare Management System
 
-Operator dashboard for **Cloudflare tunnels** and **zone controls** on the LogicEncoder SOL server. One browser UI replaces ad-hoc `config.yml` edits, scattered `curl` tests, and the Cloudflare dashboard tabs you need during incident response.
+**CFMS** is a self-hosted browser dashboard for **Cloudflare tunnels** and **zone operations**. One FastAPI app and a single HTML page replace juggling the Cloudflare dashboard, hand-edited `config.yml` files, and one-off API curls when you add a hostname, test a bot challenge, or purge cache during an incident.
 
-**Code (private):** [logicencoder/cfms](https://github.com/logicencoder/cfms)  
-**Delivery:** SOL only — `http://<sol>:5055` via `cfms.service` (not a public logicencoder.com app)
+Private source: [logicencoder/cfms](https://github.com/logicencoder/cfms). This overview describes what the UI can do — credentials and zone IDs stay in your local `.env`.
 
-Screenshots: *to be added.*
+## The problem it solves
+
+Teams that expose homelab or production services through **cloudflared** often touch the same tasks repeatedly: add an ingress hostname, reload the tunnel, confirm DNS, tighten WordPress login paths, or check whether a WAF rule still fires. CFMS puts tunnel health, config edits, backups, and Cloudflare API controls in one place with live status over WebSockets.
+
+## Tunnel management
+
+See every tunnel endpoint with live health, connection counts, and request stats. Add or remove hostnames in `config.yml`, edit the raw file when you need precision, create backups before writes, and reload, restart, stop, or start the tunnel service from the UI.
+
+## Cloudflare security and WordPress hardening
+
+Browse zone settings, custom WAF rulesets, legacy firewall rules, rate limits, IP access rules, page rules, and bot management toggles. Review security events from the last 24 hours.
+
+WordPress-focused presets protect `/wp-login.php` and `/wp-admin/*`, optionally block `/xmlrpc.php`, patch the “bypass challenge for all bots” expression, and run **live access tests** against multiple User-Agents in parallel so you can see what visitors and crawlers actually hit.
+
+## DNS, cache, analytics, and SSL
+
+Full DNS record CRUD (A, AAAA, CNAME, MX, TXT, NS, SRV, CAA). Purge the entire cache or specific URLs. View seven-day traffic analytics — requests, pageviews, bandwidth, cache hit rate, HTTPS share, threats, and unique visitors — plus per-day breakdowns.
+
+Adjust SSL/TLS mode, minimum TLS version, Always Use HTTPS, HTTP/3, TLS 1.3, and automatic HTTPS rewrites from the same panel. Run **CF Trace** (`/cdn-cgi/trace`) per User-Agent when debugging routing.
+
+## Operator safety
+
+Every config save can go through automatic backups. A global **Hide Sensitive Data** toggle masks API tokens and keys on screen — useful when sharing your desktop during support or streams.
+
+## Stack and quick start
+
+FastAPI backend with **httpx**, **orjson**, and WebSocket push; frontend is one **`cfms.html`** file — no separate Node build step.
+
+```bash
+pip install fastapi uvicorn httpx orjson psutil pyyaml
+cp .env.example .env   # Cloudflare tokens, zone ID, tunnel paths
+python3 cfms.py        # default http://localhost:5055
+```
+
+See the private repo README for environment variables and [REPOS.md](REPOS.md) for repository links.
 
 ---
 
-## What
-
-| Area | Capability |
-|------|------------|
-| **Tunnel** | List ingress endpoints, live health, add/remove hostnames in `config.yml`, backup/restore, reload/restart/stop/start `cloudflared` |
-| **Security** | Zone settings, WAF custom rules, legacy firewall, rate limits, IP rules, page rules, bot management, security events (24h) |
-| **WordPress ops** | WP hardening presets (`/wp-login.php`, `/wp-admin`, optional `xmlrpc`), bypass-rule patch, multi–User-Agent live tests |
-| **DNS & cache** | Full DNS CRUD, purge all or by URL |
-| **Insight** | 7-day traffic analytics, SSL/TLS toggles, CF trace per UA |
-| **Operator safety** | Config backups before every write; global “hide sensitive data” for screen sharing |
-
-**Stack:** FastAPI + orjson + httpx + WebSockets; UI in `cfms.html` (no separate frontend build).
-
----
-
-## Why
-
-LogicEncoder runs many services through **Cloudflare tunnels** and a single zone. Changing ingress or testing bot challenges used to mean SSH, manual YAML, and API calls. CFMS centralises that with realtime status and logs so tunnel mistakes are visible before they take production down.
-
----
-
-## Who
-
-- **Primary user:** operator maintaining SOL + Hostinger + tunnel routes  
-- **Not for:** public site visitors — internal infrastructure tool  
-- **Integrates with:** `universal-service-manager`, gas/MEXC backends exposed via tunnel hostnames documented in each app’s ARCHITECTURE
-
----
-
-## Run (summary)
-
-Copy `.env.example` → `.env` in the private repo, install deps from [cfms README](https://github.com/logicencoder/cfms/blob/main/README.md), `python3 cfms.py`. Production uses systemd on SOL — see private `ARCHITECTURE.md`.
+**Made by [Logic Encoder](https://logicencoder.com)** · [GitHub](https://github.com/logicencoder) · [Contact](https://logicencoder.com/contact/)
