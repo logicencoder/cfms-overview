@@ -1,34 +1,42 @@
 # CFMS — Cloudflare Management System
 
-**CFMS** is a self-hosted browser dashboard for **Cloudflare tunnels** and **zone operations**. One FastAPI app and a single HTML page replace juggling the Cloudflare dashboard, hand-edited `config.yml` files, and one-off API curls when you add a hostname, test a bot challenge, or purge cache during an incident.
+**CFMS** is a self-hosted browser dashboard for **Cloudflare tunnels** and **zone operations**. One FastAPI service and one web UI centralize hostname routing, tunnel operations, DNS, cache controls, security checks, and WordPress hardening workflows.
 
 Private source: [logicencoder/cfms](https://github.com/logicencoder/cfms). This overview describes what the UI can do — credentials and zone IDs stay in your local `.env`.
 
-## The problem it solves
+## Tech stack
 
-Teams that expose homelab or production services through **cloudflared** often touch the same tasks repeatedly: add an ingress hostname, reload the tunnel, confirm DNS, tighten WordPress login paths, or check whether a WAF rule still fires. CFMS puts tunnel health, config edits, backups, and Cloudflare API controls in one place with live status over WebSockets.
+| Layer | Technologies |
+|-------|--------------|
+| Backend | FastAPI + uvicorn |
+| Cloudflare API | httpx + JSON APIs + GraphQL analytics |
+| Config layer | YAML parsing for `cloudflared` tunnel config |
+| Frontend | Single-page HTML dashboard |
+| Live updates | WebSocket push from backend |
 
-## Tunnel management
+## Tunnel operations in one panel
 
-See every tunnel endpoint with live health, connection counts, and request stats. Add or remove hostnames in `config.yml`, edit the raw file when you need precision, create backups before writes, and reload, restart, stop, or start the tunnel service from the UI.
+CFMS shows live tunnel endpoint health, connections, and request counters, then lets operators edit ingress entries directly from the dashboard. You can add/remove hostnames, edit raw `config.yml`, create backups before writes, and reload or restart the tunnel service without switching tools.
 
-## Cloudflare security and WordPress hardening
+This removes a fragile workflow where tunnel changes were previously split across shell sessions, manual file edits, and separate Cloudflare pages.
 
-Browse zone settings, custom WAF rulesets, legacy firewall rules, rate limits, IP access rules, page rules, and bot management toggles. Review security events from the last 24 hours.
+## Security and WordPress hardening
 
-WordPress-focused presets protect `/wp-login.php` and `/wp-admin/*`, optionally block `/xmlrpc.php`, patch the “bypass challenge for all bots” expression, and run **live access tests** against multiple User-Agents in parallel so you can see what visitors and crawlers actually hit.
+CFMS groups Cloudflare security controls into operator workflows: rulesets, firewall/access rules, rate limits, page rules, bot settings, and recent security events. It also includes WordPress-focused presets for common attack surfaces like login and admin routes.
 
-## DNS, cache, analytics, and SSL
+A built-in multi-user-agent access test checks real behavior after rule changes, so operators can verify that intended traffic is allowed while challenge/block rules still trigger for risky paths.
 
-Full DNS record CRUD (A, AAAA, CNAME, MX, TXT, NS, SRV, CAA). Purge the entire cache or specific URLs. View seven-day traffic analytics — requests, pageviews, bandwidth, cache hit rate, HTTPS share, threats, and unique visitors — plus per-day breakdowns.
+## DNS, cache, analytics, and SSL controls
 
-Adjust SSL/TLS mode, minimum TLS version, Always Use HTTPS, HTTP/3, TLS 1.3, and automatic HTTPS rewrites from the same panel. Run **CF Trace** (`/cdn-cgi/trace`) per User-Agent when debugging routing.
+CFMS includes full DNS record management (create/read/update/delete), cache purge tools (global or URL list), seven-day analytics summaries, and TLS controls in the same interface.
 
-## Operator safety
+This helps during incidents where routing, cache state, and SSL posture must be adjusted quickly without context switching.
 
-Every config save can go through automatic backups. A global **Hide Sensitive Data** toggle masks API tokens and keys on screen — useful when sharing your desktop during support or streams.
+## Operator safety features
 
-## Stack and quick start
+Config backups are part of the write flow, and a global "Hide Sensitive Data" mode masks secret values on screen. This is useful for screen-sharing support sessions where operators need to demonstrate setup without exposing tokens.
+
+## Quick start
 
 FastAPI backend with **httpx**, **orjson**, and WebSocket push; frontend is one **`cfms.html`** file — no separate Node build step.
 
