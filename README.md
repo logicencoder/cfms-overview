@@ -4,7 +4,7 @@
 
 **CFMS** (Cloudflare Management System) is a self-hosted operator dashboard that unifies **`cloudflared` tunnel routing** and **Cloudflare zone operations** in a single FastAPI app. Instead of juggling shell edits, the Cloudflare web UI, and separate health checks, you monitor tunnel health, change ingress hostnames, manage DNS and cache, tune security rules, harden WordPress paths, and verify access — all with live WebSocket updates.
 
-Built for **operators who run private apps behind Cloudflare Tunnel** and need fast, repeatable changes during deploys and incidents. Credentials stay in your local `.env`; this overview describes product behaviour only.
+Built for **operators who run private apps behind Cloudflare Tunnel** and need fast, repeatable changes during deploys and incidents. Credentials stay in your local `.env`.
 
 **Made by [Logic Encoder](https://logicencoder.com)**
 
@@ -12,7 +12,25 @@ Private source: [logicencoder/cfms](https://github.com/logicencoder/cfms)
 
 ---
 
-## What you can do
+## Tech stack
+
+| Layer | Technologies |
+|-------|----------------|
+| Runtime | Python 3 |
+| API server | FastAPI + uvicorn (default port 5055) |
+| JSON | orjson (responses + WebSocket messages) |
+| Cloudflare | httpx async — REST v4 + GraphQL analytics/events |
+| Tunnel config | PyYAML read/write of `cloudflared` ingress YAML |
+| Host metrics | psutil (process + TCP connection counts) |
+| Health checks | async curl per hostname; DNS resolve with in-memory cache |
+| Tunnel metrics | scrape `cloudflared` Prometheus endpoint |
+| Service control | systemctl + journalctl + SIGHUP |
+| Frontend | Single `cfms.html` — vanilla JS/CSS, no Node build |
+| Real-time | WebSocket status broadcast + log stream |
+
+---
+
+## Console surfaces
 
 | Area | In plain language |
 |------|-------------------|
@@ -31,7 +49,7 @@ Everything critical refreshes over **WebSocket** — tunnel status every 15 seco
 
 ---
 
-## Feature examples (two per capability)
+## Operator workflows
 
 #### Live tunnel overview
 1. One hostname returns HTTP 502 while others are UP — you immediately know which public URL is broken without opening Prometheus.
@@ -123,34 +141,8 @@ Everything critical refreshes over **WebSocket** — tunnel status every 15 seco
 
 ---
 
-## What it does not do
+**Scope:** a single-operator deployment for tunnel routing plus everyday zone operations — run it behind your own network access control. DNS records for new tunnels are still created when routing requires them. Tokens, zone IDs, and tunnel paths stay in your local `.env`.
 
-- **Not** a multi-tenant SaaS — one operator deployment with your tokens and zone
-- **Not** a replacement for Cloudflare's full dashboard on every edge case — focused on tunnel + common zone ops
-- **Not** built-in app authentication — intended behind network access control on a trusted network
-- **Not** automatic DNS for new tunnels — you still create records when routing requires it
-
-Tokens, zone IDs, and tunnel paths stay in your local `.env` — not published in this overview repo.
-
----
-
-## Tech stack
-
-| Layer | Technologies |
-|-------|----------------|
-| Runtime | Python 3 |
-| API server | FastAPI + uvicorn (default port 5055) |
-| JSON | orjson (responses + WebSocket messages) |
-| Cloudflare | httpx async — REST v4 + GraphQL analytics/events |
-| Tunnel config | PyYAML read/write of `cloudflared` ingress YAML |
-| Host metrics | psutil (process + TCP connection counts) |
-| Health checks | async curl per hostname; DNS resolve with in-memory cache |
-| Tunnel metrics | scrape `cloudflared` Prometheus endpoint |
-| Service control | systemctl + journalctl + SIGHUP |
-| Frontend | Single `cfms.html` — vanilla JS/CSS, no Node build |
-| Real-time | WebSocket status broadcast + log stream |
-
----
 
 ## Quick start
 
