@@ -1,5 +1,7 @@
 # CFMS — Cloudflare Management System
 
+![CFMS — Cloudflare Tunnel and zone management console](assets/cfms.png)
+
 **One browser console for Cloudflare Tunnels and zone control — live health, ingress editing, DNS, cache, security rules, WordPress hardening, and multi-user-agent verification without leaving the dashboard.**
 
 **CFMS** (Cloudflare Management System) is a self-hosted operator dashboard that unifies **`cloudflared` tunnel routing** and **Cloudflare zone operations** in a single FastAPI app. Instead of juggling shell edits, the Cloudflare web UI, and separate health checks, you monitor tunnel health, change ingress hostnames, manage DNS and cache, tune security rules, harden WordPress paths, and verify access — all with live WebSocket updates.
