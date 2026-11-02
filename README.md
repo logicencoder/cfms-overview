@@ -1,53 +1,51 @@
 # CFMS — Cloudflare Management System
 
-**CFMS** is a self-hosted browser dashboard for **Cloudflare tunnels** and **zone operations**. One FastAPI service and one web UI centralize hostname routing, tunnel operations, DNS, cache controls, security checks, and WordPress hardening workflows.
+![CFMS — Cloudflare Management System workspace](assets/cfms.png)
 
-Private source: [logicencoder/cfms](https://github.com/logicencoder/cfms). This overview describes what the UI can do — credentials and zone IDs stay in your local `.env`.
+Keeping a tunneled site available can involve checking tunnels, DNS, security rules and logs in several places. CFMS brings those related tasks into one dashboard so an operator can investigate access problems and maintain the surrounding configuration with less switching.
 
 ## Tech stack
 
 | Layer | Technologies |
-|-------|--------------|
-| Backend | FastAPI + uvicorn |
-| Cloudflare API | httpx + JSON APIs + GraphQL analytics |
-| Config layer | YAML parsing for `cloudflared` tunnel config |
-| Frontend | Single-page HTML dashboard |
-| Live updates | WebSocket push from backend |
+|---|---|
+| Application | Python, FastAPI |
+| Supporting technologies | HTML, CSS, JavaScript; Cloudflare; WebSockets |
 
-## Tunnel operations in one panel
+## Understand tunnel health
 
-CFMS shows live tunnel endpoint health, connections, and request counters, then lets operators edit ingress entries directly from the dashboard. You can add/remove hostnames, edit raw `config.yml`, create backups before writes, and reload or restart the tunnel service without switching tools.
+The tunnel overview brings endpoint availability, connection activity and resource information into one view. It helps distinguish a problem with a particular hostname from a wider tunnel issue. Open the relevant logs or controls from that context instead of beginning the investigation again elsewhere.
 
-This removes a fragile workflow where tunnel changes were previously split across shell sessions, manual file edits, and separate Cloudflare pages.
+Start with the affected hostname, then compare its state with the rest of the tunnel. The overview gives the investigation a clear scope before the operator changes a setting or restarts a service.
 
-## Security and WordPress hardening
+## Maintain endpoints and DNS
 
-CFMS groups Cloudflare security controls into operator workflows: rulesets, firewall/access rules, rate limits, page rules, bot settings, and recent security events. It also includes WordPress-focused presets for common attack surfaces like login and admin routes.
+Manage the hostnames served by the tunnel and review DNS records alongside them. Editing and backup-oriented controls support routine changes, while visible results help establish whether the intended destination is available. This keeps access maintenance connected to the service being published.
 
-A built-in multi-user-agent access test checks real behavior after rule changes, so operators can verify that intended traffic is allowed while challenge/block rules still trigger for risky paths.
+DNS and endpoint configuration are two parts of the same publishing task. Reviewing them together helps the operator keep a public hostname aligned with the service it is meant to expose.
 
-## DNS, cache, analytics, and SSL controls
+## Review security and access
 
-CFMS includes full DNS record management (create/read/update/delete), cache purge tools (global or URL list), seven-day analytics summaries, and TLS controls in the same interface.
+Zone security views bring firewall rules, managed protection options and recent security events together. WordPress-oriented controls support common site administration needs. Access tests help check how a change affects the destinations and request types being examined.
 
-This helps during incidents where routing, cache state, and SSL posture must be adjusted quickly without context switching.
+Security events provide context for a reported access problem. The operator can review the relevant rule and the observed request behaviour within the same workspace.
 
-## Operator safety features
+## Inspect traffic, caching and TLS
 
-Config backups are part of the write flow, and a global "Hide Sensitive Data" mode masks secret values on screen. This is useful for screen-sharing support sessions where operators need to demonstrate setup without exposing tokens.
+Traffic summaries provide context for the site's activity, while cache and TLS controls support routine operation. Purge selected content when a publishing change needs to become visible, or review connection settings during an access issue. These tasks remain part of the same operational workspace.
 
-## Quick start
+These controls also serve everyday publishing: refresh cached content after a release, inspect traffic around a change and keep the site's connection preferences visible during troubleshooting.
 
-FastAPI backend with **httpx**, **orjson**, and WebSocket push; frontend is one **`cfms.html`** file — no separate Node build step.
+## Follow the effect of a change
 
-```bash
-pip install fastapi uvicorn httpx orjson psutil pyyaml
-cp .env.example .env   # Cloudflare tokens, zone ID, tunnel paths
-python3 cfms.py        # default http://localhost:5055
-```
+Live logs and connection indicators make the outcome of an operation easier to inspect. Service controls are available when the tunnel itself needs intervention, and sensitive-information masking helps during demonstrations. The aim is a shorter path from a reported problem to an informed action.
 
-See the private repo README for environment variables and [REPOS.md](REPOS.md) for repository links.
+The dashboard supports a complete operational loop: notice an issue, inspect the associated information, make the intended change and review the resulting state.
+
 
 ---
 
-**Made by [Logic Encoder](https://logicencoder.com)** · [GitHub](https://github.com/logicencoder) · [Contact](https://logicencoder.com/contact/)
+Private code: [cfms](https://github.com/logicencoder/cfms)
+
+See [REPOS.md](REPOS.md) for related repositories.
+
+**[Logic Encoder](https://logicencoder.com)** · [GitHub](https://github.com/logicencoder) · [Contact](https://logicencoder.com/contact/)
