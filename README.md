@@ -1,6 +1,6 @@
 # CFMS — Cloudflare Management System
 
-![CFMS — Cloudflare Management System workspace](assets/cfms.png)
+![CFMS — Cloudflare Management System workspace](assets/cfms-cloudflare-management-tunnels-dns-security.png)
 
 Keeping a tunneled site available can involve checking tunnels, DNS, security rules and logs in several places. CFMS brings those related tasks into one dashboard so an operator can investigate access problems and maintain the surrounding configuration with less switching.
 
